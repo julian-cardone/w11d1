@@ -9,7 +9,7 @@ function Form (props) {
         phoneType: "",
         staff: "",
         bio: "",
-        signUp: ""
+        signUp: false
     })
 
     const [ errors, setErrors ] = useState([])
@@ -27,19 +27,33 @@ function Form (props) {
             errors.push('Invalid email address')
         }
 
-        if (!/"^[\+]?[(]?[0-9]{3}[)]?[-\s\.]?[0-9]{3}[-\s\.]?[0-9]{4,6}$"/gmi.test(user.phoneNumber)) {
+        if (!/^[\+]?[(]?[0-9]{3}[)]?[-\s\.]?[0-9]{3}[-\s\.]?[0-9]{4,6}$/im.test(user.phoneNumber)) {
             errors.push('Invalid phone number')
         }
 
+        if (user.phoneNumber.length !== 0 && user.phoneType.length === 0){
+            errors.push('Phone Type must be selected')
+        }
 
+        if (user.bio.length > 280){
+            errors.push("Bio must be less than 280 characters")
+        }
 
         return errors
     }
 
     const handleChange = (field) => {
         return (e) => {
-            console.log(e)
+            // console.log(e)
             const newObj = Object.assign({}, user, {[field]: e.target.value})
+            setUser(newObj)
+        }
+    }
+
+    const handleCheckChange = (field) => {
+        return (e) => {
+            // console.log(e)
+            const newObj = Object.assign({}, user, {[field]: !user.signUp})
             setUser(newObj)
         }
     }
@@ -48,10 +62,10 @@ function Form (props) {
         e.preventDefault()
         let errors = validate()
 
-        console.log(user)
-
         if ( errors.length ) {
             setErrors(errors)
+        } else {
+            console.log(user)
         }
     }
 
@@ -93,7 +107,31 @@ function Form (props) {
                     <option value="Work">Work</option>
                     <option value="Mobile">Mobile</option>
                 </select>
+                <label>Instructor
+                <input 
+                    type="radio"
+                    name="staff" 
+                    value = "instructor"
+                    onChange={handleChange("staff")}
+                />
+                </label>
+                <label>Student</label>
+                <input 
+                    type="radio"
+                    name="staff" 
+                    value = "student"
+                    onChange={handleChange("staff")}
+                />
+                <textarea 
+                    onChange={handleChange("bio")}
+                    value={user.bio} 
+                />
                 <button>Submit</button>
+                <input 
+                    type="checkbox" 
+                    value={user.signUp}
+                    onChange={handleCheckChange("signUp")}
+                    />
             </form>
             <h1>{user.firstName}</h1>
             <h2>{user.lastName}</h2>
